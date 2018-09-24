@@ -81,7 +81,7 @@ Well, it's actually more...
 
 ---
 class: center, middle
-# **1,000 000** views
+# **1 000 000** views
 
 ---
 background-image:url(domain.png)
@@ -176,8 +176,99 @@ background-size: contain
 equipped with hunders of feature toggles, we started migration to...
 
 ---
+class: center, middle, invert
+background-image: url(fastr.jpg)
+background-size: contain
+???
+why have we decided to write our own? Well, we were not ready to pay Algolia's price, 
+we wanted to stay serverless, even though our discussions almost led to go for a server.
+after all Fastr was an experiment, which worked in the end.
+
+---
+class: center, middle, invert
+# Lunr.js + Loki.js 
+???
+Of course, we didn't write our own storage engine, we used good libraries with strong communities behind them.
+Lunr is a full text search engine, that is Solr/Lucene/ElasticSearch, but way simpler, of course.
+We sacrificed some of the search features for size and maintainbilty.
+Therefore we also needed a bit of aid to implement additional aggregation queries and we used in-memory collections from Loki.js.
+So, basically, Fastr is a combination of those 2 libraries.
+
+---
 class: center, middle
-# How much does it cost? 
+# Code + Fastr = 1.8GB of RAM 
+???
+That holds 56K videos to date. Why are those 1.8GB important, becuase ... [next slide]
+
+---
+class: center, middle, invert
+# Look ma, no servers!
+???
+That amount of data fits into a Lambda function! So, yes, all data is deployed together with the code. In a single function.
+
+---
+class: center, middle, invert
+background-image: url(gcf.png)
+background-size: contain
+???
+When we started in April, GCF was still beta, even though, quite usable.
+GCF reached GA only in July, 2018 
+
+---
+class: center, middle
+# Why not AWS?
+???
+We had experience with AWS before and it would seem that we should have chosen that.
+GCF provides a more transparent and simpler programming model. You can pretty much run full Express application as a function.
+Of course, you can achieve similar things with ElasticBeansTalk, but again the pricing is quite different from what Google Cloud Functions offer at the moment.
+(The only feature, that I miss from AWS is cron-invoked functions.)
+Complexity of AWS and its architecture put us off.
+
+---
+class: center, middle, invert
+# Seriously, no servers?
+???
+Well, ok, there is one. And again the decision to use that was based on the pricing.
+
+---
+class: center, middle, invert
+background-image: url(nginx.png)
+background-size: contain
+???
+Running on f1-micro instance, which has less memory than Rasspberry Pi and only one CPU.
+And you know what? It is hardly doing anything. Seriously, it's not busy at all, even when we have hug traffic.
+
+---
+class: center, middle
+# Any other issues?
+
+---
+class: center, middle
+background-image: url(ice.jpg)
+background-size: contain
+# **Cold starts**
+???
+One problem that anyone has with Lambda/Cloud functions is cold starts.
+And with Fastr deserializing the index into memory, it could be that cold start takes around 5-10 seconds.
+So, we leveraged the use of CDN for static resources. In the future we also want to 
+Also, you can notice a nice message and a progress bar to show that site is alive and just loading your data.
+
+---
+class: center, middle
+background-image: url(blue_green.jpg)
+background-size: contain
+# Blue/green  
+???
+Another issue we faced with GCF is that a freshly deployed function is not immediately available. 
+Actually, that's where AWS wins so far. So, we had to implement a blue/green deployment approach. 
+So, basicaly we have 2 versions of the same function deployed. During deployment when we are sure that function is up and running and responds in timely manner, 
+then we switch the toggle in NGINX to serve different function.
+
+---
+class: center, middle
+background-image: url(money.jpg)
+background-size: contain
+# **How much does it cost?**
 ???
 - burn rate 20$
 - 300$ from Google
