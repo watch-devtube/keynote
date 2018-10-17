@@ -17,6 +17,14 @@
         width: 300px;
       }
 
+      .fire {
+        position: absolute;
+      }
+
+      .fastr img {
+        width: 100%;
+      }
+
       .invert {
         background-color: white !important;
         color: black;
@@ -38,6 +46,11 @@
       }
       h1 strong {
           background-color: #2980b9;
+          padding: 0.2em;
+      }
+
+      .danger h1 strong {
+          background-color: #ff2400;
           padding: 0.2em;
       }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
@@ -138,6 +151,10 @@ background-size: contain
 to understand what happened next, let me show our tech stack
 
 ---
+class: center, middle
+## Front-End
+
+---
 class: invert
 background-image: url(vue.png)
 background-size: contain
@@ -158,12 +175,23 @@ background-size: contain
 - super nice
 
 ---
+class: center, middle
+## Back-End
+
+---
 class: invert
 background-image: url(algolia.png)
 background-size: contain
 ???
-- completely client-side, serverless, except SaaS Algolia. And them we started hitting limits.
+- Serverless, SaaS algolia (~elastic search as a service)
 - Algolia had OSS plan and, according to our convo, I understood it's free for OSS. No limits.
+
+
+--
+
+.fire[![](fire.png)]
+???
+- And then everything went on fire... Limits!
 
 ---
 class: center, middle
@@ -180,6 +208,10 @@ class: center, middle
 --
 
 ### @eduardsi: Thanks! Please send us the quote.
+???
+- at this point it was evident we can't pay and have to move away.
+- but we had to pretend we are willing to pay.
+
 
 --
 
@@ -190,102 +222,107 @@ class: center, middle
 background-image: url(instasearch.png)
 background-size: contain
 # **Vendor-lock in**
-???
-equipped with hunders of feature toggles, we started migration to...
-
----
-class: center, middle, invert
-background-image: url(fastr.jpg)
-background-size: contain
-???
-why have we decided to write our own? Well, we were not ready to pay Algolia's price, 
-we wanted to stay serverless, even though our discussions almost led to go for a server.
-after all Fastr was an experiment, which worked in the end.
-
----
-class: center, middle, invert
-# Lunr.js + Loki.js 
-???
-Of course, we didn't write our own storage engine, we used good libraries with strong communities behind them.
-Lunr is a full text search engine, that is Solr/Lucene/ElasticSearch, but way simpler, of course.
-We sacrificed some of the search features for size and maintainbilty.
-Therefore we also needed a bit of aid to implement additional aggregation queries and we used in-memory collections from Loki.js.
-So, basically, Fastr is a combination of those 2 libraries.
 
 ---
 class: center, middle
-# Code + Fastr = 1.8GB of RAM 
-???
-That holds 56K videos to date. Why are those 1.8GB important, becuase ... [next slide]
+# **#1 Debouncing**
+### (vuejs-tips.github.io/v-debounce)
 
 ---
-class: center, middle, invert
-# Look ma, no servers!
-???
-That amount of data fits into a Lambda function! So, yes, all data is deployed together with the code. In a single function.
+class: center, middle
+# **#2 LRU caching**
+### (github.com/isaacs/node-lru-cache)
 
 ---
-class: center, middle, invert
-background-image: url(gcf.png)
+background-image: url(fastrVersion.png)
 background-size: contain
 ???
-When we started in April, GCF was still beta, even though, quite usable.
-GCF reached GA only in July, 2018 
+- intercept requests and mimic Algolia responses.
+- feature toggles! we could switch to Algolia every time.
+
+---
+class: center, middle
+# express.js + Google Cloud Functions
+???
+- no time and money for managing servers.
+- GCF reached GA only in July, 2018. Now it's less stable than in BETA :))
 
 ---
 class: center, middle
 # Why not AWS?
 ???
-We had experience with AWS before and it would seem that we should have chosen that.
-GCF provides a more transparent and simpler programming model. You can pretty much run full Express application as a function.
-Of course, you can achieve similar things with ElasticBeansTalk, but again the pricing is quite different from what Google Cloud Functions offer at the moment.
-(The only feature, that I miss from AWS is cron-invoked functions.)
-Complexity of AWS and its architecture put us off.
+- Direct Express.js API support vs. API gateway magic
+- Easy to use, no access rights magic
+- No PhD in computer science.
 
 ---
-class: center, middle, invert
+# What can replace Algolia?
+
+--
+
+### - Elasticsearch
+
+--
+
+### - Elasticsearch
+
+--
+
+### - Elasticsearch
+
+--
+
+### - Lunr.js (github.com/olivernn/lunr.js) + Loki.js (github.com/techfort/LokiJS)
+
+???
+- self-hosted (servers)
+- managed ($$$)
+- too much advanced stuff (fuzzy text, typo tolerance, synonyms...)
+
+---
+class: center, middle
+# 56,000 indexed videos = **1.8GB of RAM**
+
+---
+background-image:url(maxmemory.png)
+background-size: contain
+
+---
+class: center, middle
+# Serverless, in-memory, cheap full-text search
+### (github.com/watch-devtube/commons/blob/master/lib/Fastr.ts)
+???
+look ma, no servers! code + data is deployed as single lambda fn.
+
+---
+class: center, middle
 # Seriously, no servers?
 ???
 Well, ok, there is one. And again the decision to use that was based on the pricing.
 
 ---
-class: center, middle, invert
-background-image: url(nginx.png)
-background-size: contain
+class: center, middle
+# **Nginx**
 ???
-Running on f1-micro instance, which has less memory than Rasspberry Pi and only one CPU.
-And you know what? It is hardly doing anything. Seriously, it's not busy at all, even when we have hug traffic.
+- f1-micro instance, less memory than Raspberry PI and only once CPU
+- handling huge traffic and no busy at all : )
 
 ---
-class: center, middle
-# Any other issues?
-
----
-class: center, middle
-background-image: url(ice.jpg)
-background-size: contain
+class: center, middle, danger
 # **Cold starts**
 ???
-One problem that anyone has with Lambda/Cloud functions is cold starts.
-And with Fastr deserializing the index into memory, it could be that cold start takes around 5-10 seconds.
-So, we leveraged the use of CDN for static resources. In the future we also want to 
-Also, you can notice a nice message and a progress bar to show that site is alive and just loading your data.
+- 5-10 seconds
+- solution: CDN for statics, progress bar! split function in smaller.
 
 ---
-class: center, middle
-background-image: url(blue_green.jpg)
-background-size: contain
-# Blue/green  
+class: center, middle, danger
+# **Zero downtime deployments**
 ???
-Another issue we faced with GCF is that a freshly deployed function is not immediately available. 
-Actually, that's where AWS wins so far. So, we had to implement a blue/green deployment approach. 
-So, basicaly we have 2 versions of the same function deployed. During deployment when we are sure that function is up and running and responds in timely manner, 
-then we switch the toggle in NGINX to serve different function.
+- aws wins here
+- we implemented blue-green. We have 2 versions, then check if app is alive, then switch nginx.
 
 ---
 class: center, middle
-background-image: url(money.jpg)
-background-size: contain
 # **How much does it cost?**
 ???
 - burn rate 20$
@@ -312,6 +349,7 @@ class: logo
 --
 
 ### - Logo?
+![](devtubelogo.svg)
 ![](troll.jpg)
 
 ---
