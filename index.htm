@@ -83,6 +83,8 @@ Well, it's actually more...
 --
 
 ### - All data is mutable 
+???
+your name is mistyped by a conf organiser
 
 --
 
@@ -238,7 +240,6 @@ background-image: url(fastrVersion.png)
 background-size: contain
 ???
 - intercept requests and mimic Algolia responses.
-- feature toggles! we could switch to Algolia every time.
 
 ---
 class: center, middle
@@ -256,15 +257,14 @@ class: center, middle
 - No PhD in computer science.
 
 ---
-# What can replace Algolia?
+# What can replace Algolia in long-term?
 
 --
 
 ### - Elasticsearch
-
---
-
-### - Elasticsearch
+???
+- self-hosted (servers)
+- managed ($$$)
 
 --
 
@@ -273,11 +273,6 @@ class: center, middle
 --
 
 ### - Lunr.js (github.com/olivernn/lunr.js) + Loki.js (github.com/techfort/LokiJS)
-
-???
-- self-hosted (servers)
-- managed ($$$)
-- too much advanced stuff (fuzzy text, typo tolerance, synonyms...)
 
 ---
 class: center, middle
@@ -298,12 +293,13 @@ look ma, no servers! code + data is deployed as single lambda fn.
 class: center, middle
 # Seriously, no servers?
 ???
-Well, ok, there is one. And again the decision to use that was based on the pricing.
+Well, ok, there is one.
 
 ---
 class: center, middle
 # **Nginx**
 ???
+- cheaper than Google Cloud LB
 - f1-micro instance, less memory than Raspberry PI and only once CPU
 - handling huge traffic and no busy at all : )
 
@@ -316,10 +312,21 @@ class: center, middle, danger
 
 ---
 class: center, middle, danger
-# **Zero downtime deployments**
+# **Downtimes**
 ???
+- no zero downtime deployments in GCF
 - aws wins here
 - we implemented blue-green. We have 2 versions, then check if app is alive, then switch nginx.
+
+---
+class: center, middle, danger
+# **Case-by-case test automation**
+???
+- we do not have the luxury of time to auto-test everything.
+- autotest things that it's hard / annoying / expensive to tests manually (ranking)
+- autotest critical scenarios (e.g. where bugs can lead to data corruption)
+- No test env, so we deploy and TiP
+- focus on MTTD / MTTR (errors go to Slack, PingDom)
 
 ---
 class: center, middle
@@ -344,7 +351,7 @@ class: logo
 
 --
 
-### - Usebase grows. Who'll pay for infrastructure?
+### - Who'll pay for infrastructure?
 
 --
 
