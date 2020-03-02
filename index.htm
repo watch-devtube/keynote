@@ -96,6 +96,10 @@ your name is mistyped by a conf organiser
 
 --
 
+### - Subscribe by channel/tag/speaker
+
+--
+
 ### - Better ranking (bit.ly/how_we_rank)
 
 --
@@ -214,18 +218,20 @@ class: center, middle
 ### youtube.com/watch?v=ldhHkVjLe7A
 
 ---
-### @eduardsi: We have become popular. Please provide us with 5M free records!
+### @eduardsi: We are victims of our popularity. Need 5M free records to survive. PLEASE!
 
 --
 
 ### @algolia: We won't be able to give you 5M operations for free. The 300k operations you have is already more than what we usually give for open-source. I'll bump it to 400k so you can enjoy your Hacker News ride, but I won't be able to do much more unfortunately. What I can do though is to hook you up with our sales team if you'd like. 
+???
+shit, exactly what we need now. dealing with sales.
 
 --
 
-### @eduardsi: Thanks! Please send us the quote.
+### @eduardsi: OK. Please send me the quote.
 ???
-- at this point it was evident we can't pay and have to move away.
-- but we had to pretend we are willing to pay.
+- at this point it was clear we can't afford it and have to run away.
+- but we had to pretend that we are a prospective customer. Saying "no" might have kill us.
 
 
 --
@@ -237,6 +243,8 @@ class: center, middle
 background-image: url(instasearch.png)
 background-size: contain
 # **Vendor-lock in**
+???
+nice Vue.js widgets. I don't to build UI! :-)
 
 ---
 class: center, middle
@@ -247,12 +255,15 @@ class: center, middle
 class: center, middle
 # **#2 LRU caching**
 ### (github.com/isaacs/node-lru-cache)
+???
+Least recently used 
 
 ---
 background-image: url(fastrVersion.png)
 background-size: contain
 ???
-- intercept requests and mimic Algolia responses.
+- can't change UI. but
+- intercept Algolia requests and mimic responses on our backend.
 
 ---
 class: center, middle
@@ -265,9 +276,9 @@ class: center, middle
 class: center, middle
 # Why not AWS?
 ???
-- Direct Express.js API support vs. API gateway magic
+- Native Express.js API support vs. API gateway magic
 - Easy to use, no access rights magic
-- No PhD in computer science.
+- No PhD in computer science (with flexibility comes cost)
 
 ---
 # What can replace Algolia in long-term?
@@ -312,6 +323,7 @@ Well, ok, there is one.
 class: center, middle
 # **Nginx**
 ???
+- glue custom domain with cloud functions.
 - cheaper than Google Cloud LB
 - f1-micro instance, less memory than Raspberry PI and only once CPU
 - handling huge traffic and no busy at all : )
@@ -321,7 +333,10 @@ class: center, middle, danger
 # **Cold starts**
 ???
 - 5-10 seconds
-- solution: CDN for statics, progress bar! split function in smaller.
+- solution: progress bar
+- solution: CDN for static files
+- solution: split functions into smaller functions
+- solution: keep functions warm
 
 ---
 class: center, middle, danger
@@ -336,6 +351,7 @@ class: center, middle, danger
 # **Case-by-case test automation**
 ???
 - we do not have the luxury of time to auto-test everything.
+- we started testing more when things stabilized (to avoid regressions).
 - autotest things that it's hard / annoying / expensive to tests manually (ranking)
 - autotest critical scenarios (e.g. where bugs can lead to data corruption)
 - No test env, so we deploy and TiP
@@ -347,11 +363,14 @@ class: center, middle
 ???
 - burn rate 20$
 - 300$ from Google
+- zero ops cost (serverless!).
 - dev time, but have amazing contributors, including famous IT peeps. See –
 
 ---
 background-image: url(leaderboard.png)
 background-size: contain
+???
+we give karma for data contributions.
 
 ---
 class: center, middle
@@ -361,10 +380,14 @@ class: center, middle
 class: logo
 
 ### - Profits?
+???
+a lot of requests from ad providers.
 
 --
 
 ### - Who'll pay for infrastructure?
+???
+we. it's not our primary business. it's for conference.
 
 --
 
